@@ -20,14 +20,14 @@ export default function EditPortfolioDialog({
   onUpdate: (updated: PortfolioItem) => void;
   onDelete: (id: string) => void;
 }) {
-  const [open, setOpen] = useState(false);
   const [editItem, setEditItem] = useState<PortfolioItem>(item);
+  const [open, setOpen] = useState(false); // 👈 state to control dialog
 
   const handleUpdate = async () => {
     try {
       await axios.patch("/api/updatePortfolioEntry", editItem);
       onUpdate(editItem);
-      setOpen(false);
+      setOpen(false); // 👈 close dialog on success
     } catch {
       alert("Failed to update item");
     }
@@ -38,7 +38,7 @@ export default function EditPortfolioDialog({
     try {
       await axios.delete(`/api/deletePortfolioEntry?id=${item.id}`);
       onDelete(item.id);
-      setOpen(false);
+      setOpen(false); // 👈 close dialog on success
     } catch {
       alert("Failed to delete item");
     }
@@ -54,11 +54,12 @@ export default function EditPortfolioDialog({
       <DialogContent>
         <DialogTitle>Edit Portfolio Item</DialogTitle>
 
+        <p className="text-sm">Name</p>
         <Input
-          placeholder="Name"
           value={editItem.name}
           onChange={(e) => setEditItem({ ...editItem, name: e.target.value })}
         />
+        <p className="text-sm">Position:</p>
         <select
           className="w-full rounded-md border px-3 py-2 text-sm mt-2"
           value={editItem.position}
@@ -69,33 +70,36 @@ export default function EditPortfolioDialog({
           <option value="Long">Long</option>
           <option value="Short">Short</option>
         </select>
+        <p className="text-sm">Symbol</p>
         <Input
-          placeholder="Symbol"
           value={editItem.symbol}
           onChange={(e) => setEditItem({ ...editItem, symbol: e.target.value })}
         />
+        <p className="text-sm">Recommended By:</p>
         <Input
-          placeholder="Recommended By"
           value={editItem.recommended_by}
           onChange={(e) =>
             setEditItem({ ...editItem, recommended_by: e.target.value })
           }
         />
+        <p className="text-sm">Shares:</p>
         <Input
-          placeholder="Shares"
           type="number"
           value={editItem.shares}
           onChange={(e) =>
             setEditItem({ ...editItem, shares: Number(e.target.value) })
           }
         />
+        <p className="text-sm">Entry Price:</p>
         <Input
-          placeholder="Cost Basis"
           type="number"
           step="0.01"
-          value={editItem.cost_basis}
+          value={editItem.entry_price}
           onChange={(e) =>
-            setEditItem({ ...editItem, cost_basis: Number(e.target.value) })
+            setEditItem({
+              ...editItem,
+              entry_price: Number(e.target.value),
+            })
           }
         />
 

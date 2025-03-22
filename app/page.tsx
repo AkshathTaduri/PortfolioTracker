@@ -8,8 +8,9 @@ import LogoutButton from "@/components/LogoutButton";
 import AddPortfolioDialog from "@/components/AddPortfolioDialog";
 import PortfolioTable from "@/components/PortfolioTable";
 import { PortfolioItem } from "@/types";
-import { Button } from "@/components/ui/button";
 import type { User } from "@supabase/supabase-js";
+import EditCashDialog from "@/components/EditCashDialog";
+import Image from "next/image";
 
 const FINNHUB_API_KEY = process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
 const FINNHUB_BASE_URL = process.env.NEXT_PUBLIC_FINNHUB_BASE_URL;
@@ -74,7 +75,9 @@ export default function PortfolioPage() {
           const stockData = await fetchStockData(item.symbol);
           const lastPrice = Number(stockData.last_price);
           const shares = Number(item.shares);
-          const costBasis = Number(item.cost_basis);
+          const entryPrice = Number(item.entry_price);
+          const costBasis = shares * entryPrice;
+          console.log(costBasis);
           const position = item.position?.toLowerCase();
 
           const marketValue = lastPrice * shares;
@@ -84,7 +87,7 @@ export default function PortfolioPage() {
               ? ((unrealizedGL / costBasis) * (shares < 0 ? -1 : 1)).toFixed(2)
               : "N/A";
 
-          totalInvestedValue += costBasis;
+          totalInvestedValue += marketValue;
 
           if (position === "long") {
             longValue += marketValue;
@@ -130,7 +133,7 @@ export default function PortfolioPage() {
 
     if (portfolio.length > 0) {
       enrichPortfolio();
-      const interval = setInterval(enrichPortfolio, 20000);
+      const interval = setInterval(enrichPortfolio, 60000);
       return () => clearInterval(interval);
     }
   }, [portfolio.length]);
@@ -163,6 +166,42 @@ export default function PortfolioPage() {
         portfolio_percent: "N/A",
         beta: "N/A",
       };
+    }
+  };
+
+  const [cash, setCash] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchCash = async () => {
+      const { data, error } = await supabase
+        .from("cash")
+        .select("cash")
+        .eq("user_id", user?.id)
+        .single();
+
+      if (error) {
+        console.error("Error fetching cash:", error);
+      } else {
+        setCash(Number(data.cash));
+      }
+    };
+
+    if (user) fetchCash();
+  }, [user]);
+
+  const updateCash = async (newCash: number) => {
+    if (isNaN(newCash)) return alert("Invalid number");
+
+    const { error } = await supabase
+      .from("cash")
+      .update({ cash: newCash })
+      .eq("user_id", user?.id);
+
+    if (error) {
+      console.error("Error updating cash:", error);
+      alert("Failed to update cash");
+    } else {
+      setCash(newCash);
     }
   };
 
@@ -213,27 +252,35 @@ export default function PortfolioPage() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-3xl font-bold">Portfolio Tracker</h1>
+        <Image src={"/images/tec_logo.png"} alt="tec" width={50} height={50} />
+
+        <h1 className="text-3xl font-bold">TEC Portfolio Tracker</h1>
         <LogoutButton />
       </div>
 
-      <div className="flex justify-between items-center mb-4">
-        <Button className="bg-blue-600 text-white">Refresh</Button>
+      <div className="flex justify-end mb-4">
         <AddPortfolioDialog />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-white rounded-lg shadow p-4 border">
-          <h2 className="text-sm text-gray-500">Invested Value</h2>
+          <h2 className="text-sm text-green-700">Invested Value</h2>
           <p className="text-lg font-semibold">${summary.investedValue}</p>
         </div>
         <div className="bg-white rounded-lg shadow p-4 border">
-          <h2 className="text-sm text-gray-500">Net Exposure</h2>
+          <h2 className="text-sm text-green-700">Net Exposure</h2>
           <p className="text-lg font-semibold">{summary.netExposure}%</p>
         </div>
         <div className="bg-white rounded-lg shadow p-4 border">
-          <h2 className="text-sm text-gray-500">Estimated AUM</h2>
+          <h2 className="text-sm text-green-700">Estimated AUM</h2>
           <p className="text-lg font-semibold">${summary.estimatedAUM}</p>
+        </div>
+        <div className="bg-white rounded-lg shadow p-4 border">
+          <div className="flex justify-between items-center">
+            <h2 className="text-sm text-green-700">Cash</h2>
+            <EditCashDialog currentCash={cash} onSave={updateCash} />
+          </div>
+          <p className="text-lg font-semibold">${cash.toFixed(2)}</p>
         </div>
       </div>
 

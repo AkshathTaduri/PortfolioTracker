@@ -27,20 +27,21 @@ export default function PortfolioTable({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Name</TableHead>
-          <TableHead>Position</TableHead>
-          <TableHead>Symbol</TableHead>
-          <TableHead>Recommended By</TableHead>
-          <TableHead>Shares</TableHead>
-          <TableHead>Cost Basis</TableHead>
-          <TableHead>Last Price</TableHead>
-          <TableHead>Change %</TableHead>
-          <TableHead>% Portfolio</TableHead>
-          <TableHead>Beta</TableHead>
-          <TableHead>Market Value</TableHead>
-          <TableHead>Unrealized G/L</TableHead>
-          <TableHead>Unrealized G/L %</TableHead>
-          {editMode && <TableHead>Actions</TableHead>}
+          <TableHead className="bg-green-700 text-white">Name</TableHead>
+          <TableHead className="bg-green-700 text-white">Position</TableHead>
+          <TableHead className="bg-green-700 text-white">Symbol</TableHead>
+          <TableHead className="bg-green-700 text-white">Recommended By</TableHead>
+          <TableHead className="bg-green-700 text-white">Shares</TableHead>
+          <TableHead className="bg-green-700 text-white">Entry Price</TableHead>
+          <TableHead className="bg-green-700 text-white">Cost Basis</TableHead>
+          <TableHead className="bg-green-700 text-white">Last Price</TableHead>
+          <TableHead className="bg-green-700 text-white">Change %</TableHead>
+          <TableHead className="bg-green-700 text-white">% Portfolio</TableHead>
+          <TableHead className="bg-green-700 text-white">Beta</TableHead>
+          <TableHead className="bg-green-700 text-white">Market Value</TableHead>
+          <TableHead className="bg-green-700 text-white">Unrealized G/L</TableHead>
+          <TableHead className="bg-green-700 text-white">Unrealized G/L %</TableHead>
+          {editMode && <TableHead className="bg-green-700 text-white">Actions</TableHead>}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -51,14 +52,53 @@ export default function PortfolioTable({
             <TableCell>{item.symbol}</TableCell>
             <TableCell>{item.recommended_by}</TableCell>
             <TableCell>{item.shares}</TableCell>
-            <TableCell>{item.cost_basis}</TableCell>
+            <TableCell>{item.entry_price}</TableCell>
+            <TableCell>{(item.shares * item.entry_price).toFixed(2)}</TableCell>
             <TableCell>{item.last_price}</TableCell>
-            <TableCell>{item.change_percent}%</TableCell>
+
+            {/* Change % */}
+            <TableCell
+              className={`text-center ${
+                Number(item.change_percent) > 0
+                  ? "bg-green-100 text-green-800"
+                  : Number(item.change_percent) < 0
+                  ? "bg-red-100 text-red-800"
+                  : ""
+              }`}
+            >
+              {item.change_percent}%
+            </TableCell>
+
             <TableCell>{item.portfolio_percent}</TableCell>
             <TableCell>{item.beta}</TableCell>
             <TableCell>${item.market_value}</TableCell>
-            <TableCell>{item.unrealized_gl}</TableCell>
-            <TableCell>{item.unrealized_gl_percent}%</TableCell>
+
+            {/* Unrealized G/L */}
+            <TableCell
+              className={`text-center ${
+                Number(item.unrealized_gl) > 0
+                  ? "bg-green-100 text-green-800"
+                  : Number(item.unrealized_gl) < 0
+                  ? "bg-red-100 text-red-800"
+                  : ""
+              }`}
+            >
+              {item.unrealized_gl}
+            </TableCell>
+
+            {/* Unrealized G/L % */}
+            <TableCell
+              className={`text-center ${
+                Number(item.unrealized_gl_percent) > 0
+                  ? "bg-green-100 text-green-800"
+                  : Number(item.unrealized_gl_percent) < 0
+                  ? "bg-red-100 text-red-800"
+                  : ""
+              }`}
+            >
+              {item.unrealized_gl_percent}%
+            </TableCell>
+
             {editMode && (
               <TableCell>
                 <EditPortfolioDialog

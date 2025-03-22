@@ -3,7 +3,7 @@ import { supabase } from "@/utils/supabase/client";
 
 export async function POST(req: Request) {
   try {
-    const { user_id, symbol, name, position, recommended_by, shares, cost_basis } = await req.json();
+    const { user_id, symbol, name, position, recommended_by, shares, entry_price } = await req.json();
 
     console.log(user_id);
     console.log(symbol);
@@ -11,9 +11,9 @@ export async function POST(req: Request) {
     console.log(position);
     console.log(recommended_by);
     console.log(shares);
-    console.log(cost_basis);
+    console.log(entry_price);
 
-    if (!user_id || !symbol || !name || !position || !shares || !cost_basis) {
+    if (!user_id || !symbol || !name || !position || !shares || !entry_price) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
@@ -44,7 +44,7 @@ export async function POST(req: Request) {
       position,
       recommended_by,
       shares,
-      cost_basis,
+      entry_price,
     });
 
     if (insertError) {

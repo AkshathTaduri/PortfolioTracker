@@ -20,7 +20,7 @@ export default function AddPortfolioDialog() {
     symbol: "",
     recommended_by: "",
     shares: 0,
-    cost_basis: 0,
+    entry_price: 0,
   });
 
   const sleep = (ms: number) =>
@@ -63,7 +63,7 @@ export default function AddPortfolioDialog() {
         symbol: "",
         recommended_by: "",
         shares: 0,
-        cost_basis: 0,
+        entry_price: 0,
       });
 
       location.reload(); // or router.refresh() if you're in App Router
@@ -121,14 +121,14 @@ export default function AddPortfolioDialog() {
           }
         />
 
-        <p className="text-sm">Cost Basis:</p>
+        <p className="text-sm">Entry Price:</p>
         <Input
-          placeholder="Cost Basis"
+          placeholder="Entry Price"
           type="number"
           step="0.01"
-          value={newItem.cost_basis}
+          value={newItem.entry_price}
           onChange={(e) =>
-            setNewItem({ ...newItem, cost_basis: Number(e.target.value) })
+            setNewItem({ ...newItem, entry_price: Number(e.target.value) })
           }
         />
 

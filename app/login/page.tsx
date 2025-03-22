@@ -11,7 +11,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
 
   if (user) {
-    router.push("/portfolio"); // Redirect if already logged in
+    router.push("/"); // Redirect if already logged in
   }
 
   const handleChange = (e: { target: { name: string; value: string } }) => {
@@ -30,7 +30,7 @@ export default function LoginPage() {
     if (error) {
       setError(error.message);
     } else {
-      router.push("/portfolio"); // Redirect after login
+      router.push("/"); // Redirect after login
     }
   };
 

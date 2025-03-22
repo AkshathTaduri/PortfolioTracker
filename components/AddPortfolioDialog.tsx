@@ -11,6 +11,7 @@ import { useState } from "react";
 import axios from "axios";
 import { PortfolioItem } from "@/types";
 import { supabase } from "@/utils/supabase/client";
+import { AxiosError } from "axios";
 
 export default function AddPortfolioDialog() {
   const [newItem, setNewItem] = useState<PortfolioItem>({
@@ -32,7 +33,7 @@ export default function AddPortfolioDialog() {
     }
 
     // Get authenticated user from Supabase
-    const { data, error } = await supabase.auth.getUser();
+    const { data } = await supabase.auth.getUser();
 
     // Optional: Wait a bit in case Supabase is still loading
     await sleep(300); // ← tweak this if needed
@@ -67,8 +68,8 @@ export default function AddPortfolioDialog() {
 
       location.reload(); // or router.refresh() if you're in App Router
     } catch (error) {
-      console.error(error);
-      alert((error as any).response?.data?.error || "Error adding entry");
+      const err = error as AxiosError<{ error: string }>;
+      alert(err.response?.data?.error || "Error adding entry");
     }
   };
 

@@ -9,6 +9,7 @@ import AddPortfolioDialog from "@/components/AddPortfolioDialog";
 import PortfolioTable from "@/components/PortfolioTable";
 import { PortfolioItem } from "@/types";
 import { Button } from "@/components/ui/button";
+import type { User } from "@supabase/supabase-js";
 
 const FINNHUB_API_KEY = process.env.NEXT_PUBLIC_FINNHUB_API_KEY;
 const FINNHUB_BASE_URL = process.env.NEXT_PUBLIC_FINNHUB_BASE_URL;
@@ -16,7 +17,8 @@ const FINNHUB_BASE_URL = process.env.NEXT_PUBLIC_FINNHUB_BASE_URL;
 export default function PortfolioPage() {
   const router = useRouter();
 
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
+
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState({
@@ -47,7 +49,7 @@ export default function PortfolioPage() {
       const { data, error } = await supabase
         .from("portfolio")
         .select("*")
-        .eq("user_id", user.id);
+        .eq("user_id", user?.id ?? "");
 
       if (error) {
         console.error("Error fetching portfolio:", error);
@@ -141,7 +143,7 @@ export default function PortfolioPage() {
         d: number;
       }>(`${FINNHUB_BASE_URL}?symbol=${symbol}&token=${FINNHUB_API_KEY}`);
       const betaResponse = await axios.get(`/api/fetchBeta?symbol=${symbol}`);
-      const beta = (betaResponse.data as { beta: any }).beta;
+      const beta = (betaResponse.data as { beta: number | string }).beta;
 
       return {
         last_price: finnhubResponse.data.c,

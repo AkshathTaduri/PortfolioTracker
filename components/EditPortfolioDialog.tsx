@@ -28,7 +28,7 @@ export default function EditPortfolioDialog({
       await axios.patch("/api/updatePortfolioEntry", editItem);
       onUpdate(editItem);
       setOpen(false);
-    } catch (err) {
+    } catch {
       alert("Failed to update item");
     }
   };
@@ -39,7 +39,7 @@ export default function EditPortfolioDialog({
       await axios.delete(`/api/deletePortfolioEntry?id=${item.id}`);
       onDelete(item.id);
       setOpen(false);
-    } catch (err) {
+    } catch {
       alert("Failed to delete item");
     }
   };

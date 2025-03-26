@@ -3,9 +3,10 @@ export interface PortfolioItem {
     user_id?: string;
     name: string;
     position: string;
-    symbol: string;
+    ticker: string;
     recommended_by: string;
     shares: number;
+    date: Date;
     entry_price: number;
     cost_basis?: number;
     last_price?: number | string;

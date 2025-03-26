@@ -29,8 +29,10 @@ export default function PortfolioTable({
         <TableRow>
           <TableHead className="bg-green-700 text-white">Name</TableHead>
           <TableHead className="bg-green-700 text-white">Position</TableHead>
-          <TableHead className="bg-green-700 text-white">Symbol</TableHead>
-          <TableHead className="bg-green-700 text-white">Recommended By</TableHead>
+          <TableHead className="bg-green-700 text-white">Ticker</TableHead>
+          <TableHead className="bg-green-700 text-white">
+            Recommended By
+          </TableHead>
           <TableHead className="bg-green-700 text-white">Shares</TableHead>
           <TableHead className="bg-green-700 text-white">Entry Price</TableHead>
           <TableHead className="bg-green-700 text-white">Cost Basis</TableHead>
@@ -38,10 +40,19 @@ export default function PortfolioTable({
           <TableHead className="bg-green-700 text-white">Change %</TableHead>
           <TableHead className="bg-green-700 text-white">% Portfolio</TableHead>
           <TableHead className="bg-green-700 text-white">Beta</TableHead>
-          <TableHead className="bg-green-700 text-white">Market Value</TableHead>
-          <TableHead className="bg-green-700 text-white">Unrealized G/L</TableHead>
-          <TableHead className="bg-green-700 text-white">Unrealized G/L %</TableHead>
-          {editMode && <TableHead className="bg-green-700 text-white">Actions</TableHead>}
+          <TableHead className="bg-green-700 text-white">
+            Market Value
+          </TableHead>
+          <TableHead className="bg-green-700 text-white">
+            Unrealized G/L
+          </TableHead>
+          <TableHead className="bg-green-700 text-white">
+            Unrealized G/L %
+          </TableHead>
+          <TableHead className="bg-green-700 text-white">Date</TableHead>
+          {editMode && (
+            <TableHead className="bg-green-700 text-white">Actions</TableHead>
+          )}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -49,7 +60,7 @@ export default function PortfolioTable({
           <TableRow key={item.id}>
             <TableCell>{item.name}</TableCell>
             <TableCell>{item.position}</TableCell>
-            <TableCell>{item.symbol}</TableCell>
+            <TableCell>{item.ticker}</TableCell>
             <TableCell>{item.recommended_by}</TableCell>
             <TableCell>{item.shares}</TableCell>
             <TableCell>{item.entry_price}</TableCell>
@@ -97,6 +108,17 @@ export default function PortfolioTable({
               }`}
             >
               {item.unrealized_gl_percent}%
+            </TableCell>
+
+            {/* ✅ New Date Column */}
+            <TableCell>
+              {item.date instanceof Date
+                ? item.date.toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })
+                : "Invalid date"}
             </TableCell>
 
             {editMode && (

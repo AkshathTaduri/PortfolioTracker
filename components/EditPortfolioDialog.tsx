@@ -21,13 +21,14 @@ export default function EditPortfolioDialog({
   onDelete: (id: string) => void;
 }) {
   const [editItem, setEditItem] = useState<PortfolioItem>(item);
-  const [open, setOpen] = useState(false); // 👈 state to control dialog
+  const [open, setOpen] = useState(false);
 
   const handleUpdate = async () => {
     try {
       await axios.patch("/api/updatePortfolioEntry", editItem);
       onUpdate(editItem);
-      setOpen(false); // 👈 close dialog on success
+      setOpen(false);
+      location.reload();
     } catch {
       alert("Failed to update item");
     }
@@ -38,7 +39,7 @@ export default function EditPortfolioDialog({
     try {
       await axios.delete(`/api/deletePortfolioEntry?id=${item.id}`);
       onDelete(item.id);
-      setOpen(false); // 👈 close dialog on success
+      setOpen(false);
     } catch {
       alert("Failed to delete item");
     }
@@ -59,6 +60,7 @@ export default function EditPortfolioDialog({
           value={editItem.name}
           onChange={(e) => setEditItem({ ...editItem, name: e.target.value })}
         />
+
         <p className="text-sm">Position:</p>
         <select
           className="w-full rounded-md border px-3 py-2 text-sm mt-2"
@@ -70,11 +72,13 @@ export default function EditPortfolioDialog({
           <option value="Long">Long</option>
           <option value="Short">Short</option>
         </select>
+
         <p className="text-sm">Symbol</p>
         <Input
-          value={editItem.symbol}
-          onChange={(e) => setEditItem({ ...editItem, symbol: e.target.value })}
+          value={editItem.ticker}
+          onChange={(e) => setEditItem({ ...editItem, ticker: e.target.value })}
         />
+
         <p className="text-sm">Recommended By:</p>
         <Input
           value={editItem.recommended_by}
@@ -82,6 +86,7 @@ export default function EditPortfolioDialog({
             setEditItem({ ...editItem, recommended_by: e.target.value })
           }
         />
+
         <p className="text-sm">Shares:</p>
         <Input
           type="number"
@@ -90,6 +95,7 @@ export default function EditPortfolioDialog({
             setEditItem({ ...editItem, shares: Number(e.target.value) })
           }
         />
+
         <p className="text-sm">Entry Price:</p>
         <Input
           type="number"
@@ -100,6 +106,20 @@ export default function EditPortfolioDialog({
               ...editItem,
               entry_price: Number(e.target.value),
             })
+          }
+        />
+
+        {/* ✅ Date Field */}
+        <p className="text-sm">Date:</p>
+        <Input
+          type="date"
+          value={
+            editItem.date instanceof Date
+              ? editItem.date.toISOString().split("T")[0]
+              : new Date(editItem.date).toISOString().split("T")[0]
+          }
+          onChange={(e) =>
+            setEditItem({ ...editItem, date: new Date(e.target.value) })
           }
         />
 

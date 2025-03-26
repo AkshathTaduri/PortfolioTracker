@@ -55,7 +55,11 @@ export default function PortfolioPage() {
       if (error) {
         console.error("Error fetching portfolio:", error);
       } else {
-        setPortfolio(data);
+        const formattedData = data.map((item) => ({
+          ...item,
+          date: new Date(item.date), // ⬅️ Convert string to Date object
+        }));
+        setPortfolio(formattedData);
       }
       setLoading(false);
     };
@@ -72,7 +76,7 @@ export default function PortfolioPage() {
 
       const enrichedPortfolio = await Promise.all(
         portfolio.map(async (item) => {
-          const stockData = await fetchStockData(item.symbol);
+          const stockData = await fetchStockData(item.ticker);
           const lastPrice = Number(stockData.last_price);
           const shares = Number(item.shares);
           const entryPrice = Number(item.entry_price);
@@ -84,7 +88,7 @@ export default function PortfolioPage() {
           const unrealizedGL = marketValue - costBasis;
           const unrealizedGLPercent =
             costBasis !== 0
-              ? ((unrealizedGL / costBasis) * (shares < 0 ? -1 : 1)).toFixed(2)
+              ? ((unrealizedGL / Math.abs(costBasis)) * 100).toFixed(2)
               : "N/A";
 
           totalInvestedValue += marketValue;

@@ -17,29 +17,26 @@ export default function AddPortfolioDialog() {
   const [newItem, setNewItem] = useState<PortfolioItem>({
     name: "",
     position: "Long",
-    symbol: "",
+    ticker: "",
     recommended_by: "",
     shares: 0,
     entry_price: 0,
+    date: new Date(), // default to today
   });
 
   const sleep = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
 
   const handleAddRow = async () => {
-    if (newItem.shares === 0 || newItem.cost_basis === 0) {
-      alert("Shares and Cost Basis must be non-zero.");
+    if (newItem.shares === 0 || newItem.entry_price === 0) {
+      alert("Shares and Entry Price must be non-zero.");
       return;
     }
 
-    // Get authenticated user from Supabase
     const { data } = await supabase.auth.getUser();
-
-    // Optional: Wait a bit in case Supabase is still loading
-    await sleep(300); // ← tweak this if needed
+    await sleep(300);
 
     const userId = data?.user?.id;
-
     if (!userId) {
       alert("User not authenticated.");
       return;
@@ -50,23 +47,23 @@ export default function AddPortfolioDialog() {
         "/api/addPortfolioEntry",
         {
           ...newItem,
-          user_id: userId, // sending user ID from client
+          user_id: userId,
         }
       );
 
       alert(response.data.message);
 
-      // Reset form
       setNewItem({
         name: "",
         position: "Long",
-        symbol: "",
+        ticker: "",
         recommended_by: "",
         shares: 0,
         entry_price: 0,
+        date: new Date(),
       });
 
-      location.reload(); // or router.refresh() if you're in App Router
+      location.reload();
     } catch (error) {
       const err = error as AxiosError<{ error: string }>;
       alert(err.response?.data?.error || "Error adding entry");
@@ -80,13 +77,13 @@ export default function AddPortfolioDialog() {
       </DialogTrigger>
       <DialogContent>
         <DialogTitle>Add Portfolio Item</DialogTitle>
+
         <p className="text-sm mt-2">Name:</p>
         <Input
           value={newItem.name}
           onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
         />
 
-        {/* Dropdown for Position */}
         <p className="text-sm">Position:</p>
         <select
           className="w-full rounded-md border px-3 py-2 text-sm mt-2"
@@ -99,8 +96,8 @@ export default function AddPortfolioDialog() {
 
         <p className="text-sm">Symbol:</p>
         <Input
-          value={newItem.symbol}
-          onChange={(e) => setNewItem({ ...newItem, symbol: e.target.value })}
+          value={newItem.ticker}
+          onChange={(e) => setNewItem({ ...newItem, ticker: e.target.value })}
         />
 
         <p className="text-sm">Recommended By:</p>
@@ -113,7 +110,6 @@ export default function AddPortfolioDialog() {
 
         <p className="text-sm">Shares:</p>
         <Input
-          placeholder="Shares"
           type="number"
           value={newItem.shares}
           onChange={(e) =>
@@ -123,7 +119,6 @@ export default function AddPortfolioDialog() {
 
         <p className="text-sm">Entry Price:</p>
         <Input
-          placeholder="Entry Price"
           type="number"
           step="0.01"
           value={newItem.entry_price}
@@ -132,7 +127,20 @@ export default function AddPortfolioDialog() {
           }
         />
 
-        <Button className="bg-green-500 text-white mt-4" onClick={handleAddRow}>
+        {/* ✅ Date Input */}
+        <p className="text-sm">Date:</p>
+        <Input
+          type="date"
+          value={newItem.date.toISOString().split("T")[0]} // format as yyyy-mm-dd
+          onChange={(e) =>
+            setNewItem({
+              ...newItem,
+              date: new Date(e.target.value),
+            })
+          }
+        />
+
+        <Button className="bg-green-700 text-white mt-4" onClick={handleAddRow}>
           Save
         </Button>
       </DialogContent>
